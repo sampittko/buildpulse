@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
 import { config } from 'dotenv';
-import { fetchGitHubCommits, getGitHubRateLimit } from '../lib/github';
-import { fetchTogglTimeEntries, fetchTogglProjects } from '../lib/toggl';
-import { loadProjects } from '../lib/projects';
+import { fetchGitHubCommits, getGitHubRateLimit } from '../app/lib/github';
+import { fetchTogglTimeEntries, fetchTogglProjects } from '../app/lib/toggl';
+import { loadProjects } from '../app/lib/projects';
 
 // Load environment variables from .env file
 config();

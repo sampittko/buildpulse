@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { config } from 'dotenv';
-import { runFullBuild } from '../lib/data-builder';
+import { runFullBuild } from '../app/lib/data-builder';
 
 // Load environment variables from .env file
 config();
