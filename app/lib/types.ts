@@ -1,7 +1,8 @@
 export interface Project {
   name: string;
   description: string;
-  githubRepo: string[] | null;
+  githubRepo: string[] | null; // Public repositories
+  githubRepoPrivate: string[] | null; // Private repositories
   togglProjectId: string;
   startYear: number;
   endYear?: number | null;

@@ -14,6 +14,8 @@ interface BuildData {
   lastUpdated: string;
   summary: {
     totalProjects: number;
+    publicProjects: number;
+    privateProjects: number;
     activeProjects: number;
     slowingProjects: number;
     dormantProjects: number;
@@ -86,6 +88,8 @@ export async function buildProjectPulseData(): Promise<BuildData> {
   // Calculate summary statistics
   const summary = {
     totalProjects: projectPulses.length,
+    publicProjects: projectPulses.filter(p => p.project.githubRepo && p.project.githubRepo.length > 0).length,
+    privateProjects: projectPulses.filter(p => p.project.githubRepoPrivate && p.project.githubRepoPrivate.length > 0).length,
     activeProjects: projectPulses.filter(p => p.healthStatus === 'active').length,
     slowingProjects: projectPulses.filter(p => p.healthStatus === 'slowing').length,
     dormantProjects: projectPulses.filter(p => p.healthStatus === 'dormant').length,
@@ -105,6 +109,7 @@ export async function buildProjectPulseData(): Promise<BuildData> {
   console.log(`\n✅ BuildPulse data generation completed in ${duration}s`);
   console.log(`📈 Summary: ${summary.activeProjects} active, ${summary.slowingProjects} slowing, ${summary.dormantProjects} dormant`);
   console.log(`💻 Total: ${summary.totalWeeklyCommits} commits, ${summary.totalWeeklyHours}h this week`);
+  console.log(`📁 Repos: ${summary.publicProjects} public, ${summary.privateProjects} private`);
 
   return buildData;
 }

@@ -1,7 +1,7 @@
 import { ProjectPulse } from '@/app/lib/types';
 
 interface ProjectCardProps {
-  projectPulse: ProjectPulse;
+  pulse: ProjectPulse;
 }
 
 function getHealthColor(status: string): string {
@@ -30,8 +30,10 @@ function getHealthEmoji(status: string): string {
   }
 }
 
-export default function ProjectCard({ projectPulse }: ProjectCardProps) {
-  const { project, weeklyCommits, weeklyHours, pulseScore, healthStatus } = projectPulse;
+export default function ProjectCard({ pulse }: ProjectCardProps) {
+  const { project, weeklyCommits, weeklyHours, pulseScore, healthStatus } = pulse;
+  const hasPublicRepos = project.githubRepo && project.githubRepo.length > 0;
+  const hasPrivateRepos = project.githubRepoPrivate && project.githubRepoPrivate.length > 0;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
@@ -40,10 +42,12 @@ export default function ProjectCard({ projectPulse }: ProjectCardProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-xl font-semibold text-gray-900">{project.name}</h3>
-            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getHealthColor(healthStatus)}`}>
-              {getHealthEmoji(healthStatus)}
-              {healthStatus.charAt(0).toUpperCase() + healthStatus.slice(1)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getHealthColor(healthStatus)}`}>
+                {getHealthEmoji(healthStatus)}
+                {healthStatus.charAt(0).toUpperCase() + healthStatus.slice(1)}
+              </span>
+            </div>
           </div>
           <p className="text-gray-600 text-sm leading-relaxed">{project.description}</p>
         </div>
@@ -75,17 +79,29 @@ export default function ProjectCard({ projectPulse }: ProjectCardProps) {
       </div>
 
       {/* Repository Info */}
-      {project.githubRepo && project.githubRepo.length > 0 && (
+      {(hasPublicRepos || hasPrivateRepos) && (
         <div className="mb-4">
           <div className="text-xs font-medium text-gray-500 mb-2">REPOSITORIES</div>
           <div className="flex flex-wrap gap-2">
-            {project.githubRepo.map((repo, index) => (
+            {/* Public repositories - show repository names */}
+            {hasPublicRepos && project.githubRepo?.map((repo, index) => (
               <span
-                key={index}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono"
+                key={`public-${index}`}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-mono"
               >
-                <span className="text-gray-500">📁</span>
+                <span className="text-green-600">📁</span>
                 {repo}
+              </span>
+            ))}
+
+            {/* Private repositories - don't show repository names since users can't access them */}
+            {hasPrivateRepos && project.githubRepoPrivate?.map((_, index) => (
+              <span
+                key={`private-${index}`}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-mono"
+              >
+                <span className="text-gray-500">🔒</span>
+                Private Repo
               </span>
             ))}
           </div>

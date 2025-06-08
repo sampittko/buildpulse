@@ -7,6 +7,8 @@ export interface DashboardData {
   lastUpdated: string;
   summary: {
     totalProjects: number;
+    publicProjects: number;
+    privateProjects: number;
     activeProjects: number;
     slowingProjects: number;
     dormantProjects: number;
@@ -16,7 +18,7 @@ export interface DashboardData {
 }
 
 /**
- * Load dashboard data from build output
+ * Load dashboard data from build output (SERVER SIDE ONLY)
  */
 export function loadDashboardData(): DashboardData | null {
   try {
@@ -47,6 +49,7 @@ export function getMockDashboardData(): DashboardData {
         name: 'fwt. axis',
         description: 'My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track',
         githubRepo: ['sampittko/fwt-axis'],
+        githubRepoPrivate: null,
         togglProjectId: '211046031',
         startYear: 2025,
         endYear: null,
@@ -63,7 +66,8 @@ export function getMockDashboardData(): DashboardData {
       project: {
         name: 'Secret project',
         description: "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
-        githubRepo: ['extropysk/hookers', 'extropysk/hookers-frontend'],
+        githubRepo: null,
+        githubRepoPrivate: ['extropysk/hookers', 'extropysk/hookers-frontend'],
         togglProjectId: '206566140',
         startYear: 2024,
         endYear: null,
@@ -81,6 +85,7 @@ export function getMockDashboardData(): DashboardData {
         name: 'Creator Dashboard',
         description: 'I needed a dashboard for accountability to track my content journey so here it is',
         githubRepo: ['sampittko/creator-dashboard'],
+        githubRepoPrivate: null,
         togglProjectId: '210584842',
         startYear: 2025,
         endYear: 2025,
@@ -100,6 +105,8 @@ export function getMockDashboardData(): DashboardData {
     lastUpdated: new Date().toISOString(),
     summary: {
       totalProjects: mockProjects.length,
+      publicProjects: mockProjects.filter(p => p.project.githubRepo && p.project.githubRepo.length > 0).length,
+      privateProjects: mockProjects.filter(p => p.project.githubRepoPrivate && p.project.githubRepoPrivate.length > 0).length,
       activeProjects: mockProjects.filter(p => p.healthStatus === 'active').length,
       slowingProjects: mockProjects.filter(p => p.healthStatus === 'slowing').length,
       dormantProjects: mockProjects.filter(p => p.healthStatus === 'dormant').length,
@@ -110,9 +117,10 @@ export function getMockDashboardData(): DashboardData {
 }
 
 /**
- * Load dashboard data with fallback to mock data
+ * Load dashboard data with fallback to mock data (SERVER SIDE ONLY)
  */
 export function getDashboardData(): DashboardData {
   const data = loadDashboardData();
   return data || getMockDashboardData();
-} 
+}
+

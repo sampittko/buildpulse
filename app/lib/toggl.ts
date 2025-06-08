@@ -39,14 +39,14 @@ export async function fetchTogglTimeEntries(
       'Content-Type': 'application/json',
     };
 
-    // Fetch time entries for the project
-    const url = `https://api.track.toggl.com/api/v9/me/time_entries?start_date=${startDate}&end_date=${today}&project_id=${projectId}`;
+    // Fetch ALL time entries for the date range (API doesn't support project filtering)
+    const url = `https://api.track.toggl.com/api/v9/me/time_entries?start_date=${startDate}&end_date=${today}`;
 
     const response = await fetch(url, { headers });
 
     if (!response.ok) {
       if (response.status === 403) {
-        console.warn(`Access denied for Toggl project ${projectId} - check API token`);
+        console.warn(`Access denied for Toggl API - check API token`);
         return {
           projectId,
           weeklyHours: 0,
@@ -56,14 +56,19 @@ export async function fetchTogglTimeEntries(
       throw new Error(`Toggl API error: ${response.status} ${response.statusText}`);
     }
 
-    const timeEntries: TogglTimeEntry[] = await response.json();
+    const allTimeEntries: TogglTimeEntry[] = await response.json();
+
+    // Filter time entries by project ID (client-side since API doesn't support this)
+    const projectTimeEntries = allTimeEntries.filter(entry =>
+      entry.project_id === parseInt(projectId)
+    );
 
     // Calculate weekly hours (current week starting from Saturday)
     const weekStart = getWeekStart();
 
     console.log(`📅 Current week: ${getCurrentWeekDescription()}`);
 
-    const weeklyEntries = timeEntries.filter(entry => {
+    const weeklyEntries = projectTimeEntries.filter(entry => {
       const entryDate = new Date(entry.start);
       return entryDate >= weekStart;
     });
@@ -77,14 +82,14 @@ export async function fetchTogglTimeEntries(
 
     // Debug: Show some sample entries
     if (weeklyEntries.length > 0 && weeklyEntries.length <= 5) {
-      console.log(`🔍 Sample weekly entries:`);
+      console.log(`🔍 Sample weekly entries for project ${projectId}:`);
       weeklyEntries.forEach(entry => {
         const hours = entry.duration / 3600;
         const date = new Date(entry.start).toISOString().split('T')[0];
         console.log(`   ${date}: ${hours.toFixed(2)}h - ${entry.description || 'No description'}`);
       });
     } else if (weeklyEntries.length > 5) {
-      console.log(`🔍 First 3 weekly entries (${weeklyEntries.length} total):`);
+      console.log(`🔍 First 3 weekly entries for project ${projectId} (${weeklyEntries.length} total):`);
       weeklyEntries.slice(0, 3).forEach(entry => {
         const hours = entry.duration / 3600;
         const date = new Date(entry.start).toISOString().split('T')[0];
@@ -92,12 +97,12 @@ export async function fetchTogglTimeEntries(
       });
     }
 
-    console.log(`✅ Fetched ${timeEntries.length} total entries, ${weeklyEntries.length} this week for project ${projectId} (${weeklyHours.toFixed(2)}h this week)`);
+    console.log(`✅ Fetched ${allTimeEntries.length} total entries, filtered to ${projectTimeEntries.length} for project ${projectId}, ${weeklyEntries.length} this week (${weeklyHours.toFixed(2)}h this week)`);
 
     return {
       projectId,
       weeklyHours: Math.round(weeklyHours * 100) / 100, // Round to 2 decimal places
-      totalEntries: timeEntries.length
+      totalEntries: projectTimeEntries.length
     };
 
   } catch (error) {

@@ -2,73 +2,10 @@
   "projects": [
     {
       "project": {
-        "name": "BuildPulse",
-        "description": "My personal dashboard to track my projects and their health",
-        "githubRepo": [
-          "sampittko/buildpulse"
-        ],
-        "togglProjectId": "211809379",
-        "startYear": 2025,
-        "endYear": null,
-        "tags": [
-          "Hobby"
-        ],
-        "url": null,
-        "logo": null
-      },
-      "weeklyCommits": 7,
-      "weeklyHours": 0.16,
-      "pulseScore": 10.82,
-      "healthStatus": "active"
-    },
-    {
-      "project": {
-        "name": "Secret project",
-        "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
-        "githubRepo": [
-          "extropysk/hookers",
-          "extropysk/hookers-frontend"
-        ],
-        "togglProjectId": "206566140",
-        "startYear": 2024,
-        "endYear": null,
-        "tags": [
-          "Entrepreneurship"
-        ],
-        "url": null,
-        "logo": null
-      },
-      "weeklyCommits": 2,
-      "weeklyHours": 0.16,
-      "pulseScore": 3.32,
-      "healthStatus": "dormant"
-    },
-    {
-      "project": {
-        "name": "Creator Dashboard",
-        "description": "I needed a dashboard for accountability to track my content journey so here it is",
-        "githubRepo": [
-          "sampittko/creator-dashboard"
-        ],
-        "togglProjectId": "210584842",
-        "startYear": 2025,
-        "endYear": 2025,
-        "tags": [
-          "Hobby"
-        ],
-        "url": "https://fwt.wtf/creator-dashboard?utm_source=samuelpitonak.sk",
-        "logo": null
-      },
-      "weeklyCommits": 1,
-      "weeklyHours": 0.16,
-      "pulseScore": 1.82,
-      "healthStatus": "dormant"
-    },
-    {
-      "project": {
         "name": "fwt. axis",
         "description": "My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track",
-        "githubRepo": [
+        "githubRepo": null,
+        "githubRepoPrivate": [
           "sampittko/fwt-axis"
         ],
         "togglProjectId": "211046031",
@@ -81,62 +18,43 @@
         "logo": null
       },
       "weeklyCommits": 0,
-      "weeklyHours": 0.16,
-      "pulseScore": 0.32,
+      "weeklyHours": 0,
+      "pulseScore": 0,
       "healthStatus": "dormant"
     },
     {
       "project": {
-        "name": "Link Shortener",
-        "description": "I needed a link shortener to reference my content assets easily so here it is",
-        "githubRepo": [
-          "sampittko/link-shortener"
+        "name": "Secret project",
+        "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
+        "githubRepo": null,
+        "githubRepoPrivate": [
+          "extropysk/hookers",
+          "extropysk/hookers-frontend"
         ],
-        "togglProjectId": "211585604",
-        "startYear": 2025,
-        "endYear": 2025,
-        "tags": [
-          "Hobby"
-        ],
-        "url": "https://fwt.wtf/link-shortener?utm_source=samuelpitonak.sk",
-        "logo": null
-      },
-      "weeklyCommits": 0,
-      "weeklyHours": 0.16,
-      "pulseScore": 0.32,
-      "healthStatus": "dormant"
-    },
-    {
-      "project": {
-        "name": "Joex",
-        "description": "Journal extension app for iOS",
-        "githubRepo": [
-          "sampittko/joex-ios-swift",
-          "sampittko/joex-pwa-ionic",
-          "sampittko/joex-website"
-        ],
-        "togglProjectId": "205349707",
+        "togglProjectId": "206566140",
         "startYear": 2024,
-        "endYear": 2024,
+        "endYear": null,
         "tags": [
-          "Hobby"
+          "Entrepreneurship"
         ],
-        "url": "https://joex-ios-swift.vercel.app/?utm_source=samuelpitonak.sk",
+        "url": null,
         "logo": null
       },
       "weeklyCommits": 0,
-      "weeklyHours": 0.16,
-      "pulseScore": 0.32,
+      "weeklyHours": 0,
+      "pulseScore": 0,
       "healthStatus": "dormant"
     }
   ],
-  "lastUpdated": "2025-06-08T21:42:37.176Z",
+  "lastUpdated": "2025-06-08T22:13:16.837Z",
   "summary": {
-    "totalProjects": 6,
-    "activeProjects": 1,
+    "totalProjects": 2,
+    "publicProjects": 0,
+    "privateProjects": 2,
+    "activeProjects": 0,
     "slowingProjects": 0,
-    "dormantProjects": 5,
-    "totalWeeklyCommits": 10,
-    "totalWeeklyHours": 0.96
+    "dormantProjects": 2,
+    "totalWeeklyCommits": 0,
+    "totalWeeklyHours": 0
   }
 }

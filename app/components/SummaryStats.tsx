@@ -1,4 +1,4 @@
-import { DashboardData } from '@/app/lib/dashboard-data';
+import { DashboardData } from '@/app/lib/server-data';
 
 interface SummaryStatsProps {
   data: DashboardData;
@@ -36,13 +36,13 @@ export default function SummaryStats({ data }: SummaryStatsProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {/* Total Projects */}
         <div className="bg-gray-50 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-gray-900 mb-1">
             {summary.totalProjects}
           </div>
-          <div className="text-sm text-gray-600">Total Projects</div>
+          <div className="text-sm text-gray-600">All Projects</div>
         </div>
 
         {/* Active Projects */}
@@ -75,6 +75,14 @@ export default function SummaryStats({ data }: SummaryStatsProps) {
             {summary.totalWeeklyCommits} / {summary.totalWeeklyHours.toFixed(1)}h
           </div>
           <div className="text-sm text-indigo-700">Commits / Hours</div>
+        </div>
+
+        {/* Repository Stats */}
+        <div className="bg-purple-50 rounded-lg p-4 text-center">
+          <div className="text-lg font-bold text-purple-900 mb-1">
+            {summary.publicProjects} / {summary.privateProjects}
+          </div>
+          <div className="text-sm text-purple-700">Public / Private Repos</div>
         </div>
       </div>
 

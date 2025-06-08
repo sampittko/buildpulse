@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Project, ProjectPulse, HealthStatus, PulseScoreConfig } from './types';
+import { Project, HealthStatus, PulseScoreConfig } from './types';
 
 // Default pulse score configuration
 const DEFAULT_PULSE_CONFIG: PulseScoreConfig = {
