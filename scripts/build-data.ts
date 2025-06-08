@@ -1,6 +1,10 @@
 #!/usr/bin/env tsx
 
+import { config } from 'dotenv';
 import { runFullBuild } from '../lib/data-builder';
+
+// Load environment variables from .env file
+config();
 
 /**
  * CLI script for building BuildPulse data

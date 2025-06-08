@@ -1,4 +1,5 @@
 import { TogglTimeData } from './types';
+import { getWeekStart, getCurrentWeekDescription } from './date-utils';
 
 interface TogglTimeEntry {
   id: number;
@@ -57,20 +58,41 @@ export async function fetchTogglTimeEntries(
 
     const timeEntries: TogglTimeEntry[] = await response.json();
 
-    // Calculate weekly hours (last 7 days)
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    // Calculate weekly hours (current week starting from Saturday)
+    const weekStart = getWeekStart();
 
-    const weeklyEntries = timeEntries.filter(entry =>
-      new Date(entry.start) >= oneWeekAgo
-    );
+    console.log(`📅 Current week: ${getCurrentWeekDescription()}`);
+
+    const weeklyEntries = timeEntries.filter(entry => {
+      const entryDate = new Date(entry.start);
+      return entryDate >= weekStart;
+    });
 
     const weeklyHours = weeklyEntries.reduce((total, entry) => {
+      // Handle negative durations (running timers)
+      const duration = entry.duration < 0 ? 0 : entry.duration;
       // Convert seconds to hours
-      return total + (entry.duration / 3600);
+      return total + (duration / 3600);
     }, 0);
 
-    console.log(`✅ Fetched ${timeEntries.length} time entries for project ${projectId} (${weeklyHours.toFixed(2)}h this week)`);
+    // Debug: Show some sample entries
+    if (weeklyEntries.length > 0 && weeklyEntries.length <= 5) {
+      console.log(`🔍 Sample weekly entries:`);
+      weeklyEntries.forEach(entry => {
+        const hours = entry.duration / 3600;
+        const date = new Date(entry.start).toISOString().split('T')[0];
+        console.log(`   ${date}: ${hours.toFixed(2)}h - ${entry.description || 'No description'}`);
+      });
+    } else if (weeklyEntries.length > 5) {
+      console.log(`🔍 First 3 weekly entries (${weeklyEntries.length} total):`);
+      weeklyEntries.slice(0, 3).forEach(entry => {
+        const hours = entry.duration / 3600;
+        const date = new Date(entry.start).toISOString().split('T')[0];
+        console.log(`   ${date}: ${hours.toFixed(2)}h - ${entry.description || 'No description'}`);
+      });
+    }
+
+    console.log(`✅ Fetched ${timeEntries.length} total entries, ${weeklyEntries.length} this week for project ${projectId} (${weeklyHours.toFixed(2)}h this week)`);
 
     return {
       projectId,

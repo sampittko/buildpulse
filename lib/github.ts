@@ -1,4 +1,5 @@
 import { GitHubCommitData, ProjectGitHubData } from './types';
+import { getWeekStart } from './date-utils';
 
 interface GitHubCommit {
   sha: string;
@@ -7,11 +8,6 @@ interface GitHubCommit {
       date: string;
     };
   };
-}
-
-interface GitHubApiResponse {
-  commits: GitHubCommit[];
-  error?: string;
 }
 
 /**
@@ -57,19 +53,18 @@ export async function fetchGitHubCommits(
 
     const commits: GitHubCommit[] = await response.json();
 
-    // Calculate weekly commits (last 7 days)
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    // Calculate weekly commits (current week starting from Saturday)
+    const weekStart = getWeekStart();
 
     const weeklyCommits = commits.filter(commit =>
-      new Date(commit.commit.author.date) >= oneWeekAgo
+      new Date(commit.commit.author.date) >= weekStart
     ).length;
 
     const lastCommitDate = commits.length > 0
       ? commits[0].commit.author.date
       : null;
 
-    console.log(`✅ Fetched ${commits.length} commits for ${repoName} (${weeklyCommits} this week)`);
+    console.log(`✅ Fetched ${commits.length} total commits for ${repoName} (${weeklyCommits} this week since Saturday)`);
 
     return {
       repoName,

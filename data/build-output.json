@@ -2,23 +2,24 @@
   "projects": [
     {
       "project": {
-        "name": "Link Shortener",
-        "description": "I needed a link shortener to reference my content assets easily so here it is",
+        "name": "Secret project",
+        "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
         "githubRepo": [
-          "sampittko/link-shortener"
+          "extropysk/hookers",
+          "extropysk/hookers-frontend"
         ],
-        "togglProjectId": "211585604",
-        "startYear": 2025,
-        "endYear": 2025,
+        "togglProjectId": "206566140",
+        "startYear": 2024,
+        "endYear": null,
         "tags": [
-          "Hobby"
+          "Entrepreneurship"
         ],
-        "url": "https://fwt.wtf/link-shortener?utm_source=samuelpitonak.sk",
+        "url": null,
         "logo": null
       },
-      "weeklyCommits": 1,
-      "weeklyHours": 0,
-      "pulseScore": 1.5,
+      "weeklyCommits": 2,
+      "weeklyHours": 0.16,
+      "pulseScore": 3.32,
       "healthStatus": "dormant"
     },
     {
@@ -38,8 +39,8 @@
         "logo": null
       },
       "weeklyCommits": 1,
-      "weeklyHours": 0,
-      "pulseScore": 1.5,
+      "weeklyHours": 0.16,
+      "pulseScore": 1.82,
       "healthStatus": "dormant"
     },
     {
@@ -59,30 +60,29 @@
         "logo": null
       },
       "weeklyCommits": 0,
-      "weeklyHours": 0,
-      "pulseScore": 0,
+      "weeklyHours": 0.16,
+      "pulseScore": 0.32,
       "healthStatus": "dormant"
     },
     {
       "project": {
-        "name": "Secret project",
-        "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
+        "name": "Link Shortener",
+        "description": "I needed a link shortener to reference my content assets easily so here it is",
         "githubRepo": [
-          "extropysk/hookers",
-          "extropysk/hookers-frontend"
+          "sampittko/link-shortener"
         ],
-        "togglProjectId": "206566140",
-        "startYear": 2024,
-        "endYear": null,
+        "togglProjectId": "211585604",
+        "startYear": 2025,
+        "endYear": 2025,
         "tags": [
-          "Entrepreneurship"
+          "Hobby"
         ],
-        "url": null,
+        "url": "https://fwt.wtf/link-shortener?utm_source=samuelpitonak.sk",
         "logo": null
       },
       "weeklyCommits": 0,
-      "weeklyHours": 0,
-      "pulseScore": 0,
+      "weeklyHours": 0.16,
+      "pulseScore": 0.32,
       "healthStatus": "dormant"
     },
     {
@@ -104,18 +104,18 @@
         "logo": null
       },
       "weeklyCommits": 0,
-      "weeklyHours": 0,
-      "pulseScore": 0,
+      "weeklyHours": 0.16,
+      "pulseScore": 0.32,
       "healthStatus": "dormant"
     }
   ],
-  "lastUpdated": "2025-06-08T21:17:12.736Z",
+  "lastUpdated": "2025-06-08T21:25:44.432Z",
   "summary": {
     "totalProjects": 5,
     "activeProjects": 0,
     "slowingProjects": 0,
     "dormantProjects": 5,
-    "totalWeeklyCommits": 2,
-    "totalWeeklyHours": 0
+    "totalWeeklyCommits": 3,
+    "totalWeeklyHours": 0.8
   }
 }
