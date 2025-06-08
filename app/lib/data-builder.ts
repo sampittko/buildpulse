@@ -84,7 +84,7 @@ export async function buildProjectPulseData(): Promise<BuildData> {
     // Merge GitHub and Toggl weekly data
     const mergedWeeklyData = mergeWeeklyData(githubData.weeklyData, togglData.weeklyData);
 
-    // Calculate enhanced pulse score with trends
+    // Calculate enhanced pulse score with trends and target awareness
     const {
       pulseScore,
       trendScore,
@@ -92,7 +92,7 @@ export async function buildProjectPulseData(): Promise<BuildData> {
       hoursTrend,
       weeklyCommits,
       weeklyHours
-    } = calculateEnhancedPulseScore(mergedWeeklyData);
+    } = calculateEnhancedPulseScore(mergedWeeklyData, project.targetWeeklyHours);
 
     // Determine health status with trend consideration
     const healthStatus = getEnhancedHealthStatus(pulseScore, commitTrend, hoursTrend);
@@ -110,7 +110,10 @@ export async function buildProjectPulseData(): Promise<BuildData> {
       pulseScore,
       trendScore,
       healthStatus,
-      trendStatus
+      trendStatus,
+      // Target tracking
+      hoursTarget: project.targetWeeklyHours,
+      hoursProgress: project.targetWeeklyHours > 0 ? (hoursTrend.recent / project.targetWeeklyHours * 100) : 0,
     };
 
     projectPulses.push(projectPulse);
@@ -132,6 +135,7 @@ export async function buildProjectPulseData(): Promise<BuildData> {
     dormantProjects: projectPulses.filter(p => p.healthStatus === 'dormant').length,
     totalWeeklyCommits: projectPulses.reduce((sum, p) => sum + p.weeklyCommits, 0),
     totalWeeklyHours: projectPulses.reduce((sum, p) => sum + p.weeklyHours, 0),
+    totalTargetHours: projectPulses.reduce((sum, p) => sum + p.hoursTarget, 0),
     improvingProjects: projectPulses.filter(p => p.trendStatus === 'improving').length,
     decliningProjects: projectPulses.filter(p => p.trendStatus === 'declining').length,
     stableProjects: projectPulses.filter(p => p.trendStatus === 'stable').length,

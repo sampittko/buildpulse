@@ -9,7 +9,8 @@
     "endYear": null,
     "tags": ["Hobby"],
     "url": "https://fwt.wtf/track-reflect-repeat?utm_source=samuelpitonak.sk",
-    "logo": null
+    "logo": null,
+    "targetWeeklyHours": 8
   },
   {
     "name": "Secret project",
@@ -21,6 +22,7 @@
     "endYear": null,
     "tags": ["Entrepreneurship"],
     "url": null,
-    "logo": null
+    "logo": null,
+    "targetWeeklyHours": 8
   }
 ] 

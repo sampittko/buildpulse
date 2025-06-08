@@ -15,18 +15,19 @@
           "Hobby"
         ],
         "url": "https://fwt.wtf/track-reflect-repeat?utm_source=samuelpitonak.sk",
-        "logo": null
+        "logo": null,
+        "targetWeeklyHours": 8
       },
       "weeklyCommits": 0,
       "weeklyHours": 0,
       "weeklyData": [
         {
-          "weekStart": "2025-03-21",
+          "weekStart": "2025-03-22",
           "commits": 0,
           "hours": 0
         },
         {
-          "weekStart": "2025-03-28",
+          "weekStart": "2025-03-29",
           "commits": 0,
           "hours": 0
         },
@@ -95,10 +96,12 @@
         "direction": "decreasing",
         "changePercentage": -63.05440844385114
       },
-      "pulseScore": 19.46084492877493,
+      "pulseScore": 11.676506957264957,
       "trendScore": 2.5496828917378918,
       "healthStatus": "slowing",
-      "trendStatus": "declining"
+      "trendStatus": "declining",
+      "hoursTarget": 8,
+      "hoursProgress": 17.13715277777778
     },
     {
       "project": {
@@ -116,20 +119,21 @@
           "Entrepreneurship"
         ],
         "url": null,
-        "logo": null
+        "logo": null,
+        "targetWeeklyHours": 8
       },
       "weeklyCommits": 6,
       "weeklyHours": 0.47444444444444445,
       "weeklyData": [
         {
-          "weekStart": "2025-03-21",
+          "weekStart": "2025-03-22",
           "commits": 3,
           "hours": 0.6638888888888889
         },
         {
-          "weekStart": "2025-03-28",
+          "weekStart": "2025-03-29",
           "commits": 4,
-          "hours": 2.5772222222222223
+          "hours": 4.244722222222222
         },
         {
           "weekStart": "2025-04-04",
@@ -192,17 +196,19 @@
       "hoursTrend": {
         "recent": 5.2629166666666665,
         "medium": 4.1876388888888885,
-        "longer": 5.666087962962963,
+        "longer": 5.805046296296297,
         "direction": "stable",
-        "changePercentage": -7.115514247778573
+        "changePercentage": -9.338937227348502
       },
-      "pulseScore": 24.50206416666667,
-      "trendScore": 3.560128981481482,
+      "pulseScore": 17.842877583194444,
+      "trendScore": 3.5695781481481483,
       "healthStatus": "slowing",
-      "trendStatus": "declining"
+      "trendStatus": "declining",
+      "hoursTarget": 8,
+      "hoursProgress": 65.78645833333333
     }
   ],
-  "lastUpdated": "2025-06-08T22:31:46.813Z",
+  "lastUpdated": "2025-06-08T23:13:28.610Z",
   "summary": {
     "totalProjects": 2,
     "publicProjects": 0,
@@ -212,6 +218,7 @@
     "dormantProjects": 0,
     "totalWeeklyCommits": 6,
     "totalWeeklyHours": 0.47444444444444445,
+    "totalTargetHours": 16,
     "improvingProjects": 0,
     "decliningProjects": 2,
     "stableProjects": 0

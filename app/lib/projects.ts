@@ -14,6 +14,9 @@ const DEFAULT_PULSE_CONFIG: PulseScoreConfig = {
   mediumWeight: 0.3, // Medium term activity 
   longerWeight: 0.2, // Longer term activity weighted lowest
   trendWeight: 0.2, // Trend direction bonus/penalty
+  // Target completion adjustments
+  targetCompletionBonus: 1.0,   // 100% multiplier for exceeding targets
+  targetCompletionPenalty: 0.8, // 80% multiplier for missing targets
 };
 
 /**
@@ -42,10 +45,11 @@ export function calculatePulseScore(
 }
 
 /**
- * Calculate enhanced pulse score with trend analysis
+ * Calculate enhanced pulse score with trend analysis and target awareness
  */
 export function calculateEnhancedPulseScore(
   weeklyData: WeeklyData[],
+  targetWeeklyHours: number = 0,
   config: PulseScoreConfig = DEFAULT_PULSE_CONFIG
 ): {
   pulseScore: number;
@@ -59,10 +63,11 @@ export function calculateEnhancedPulseScore(
   const commitTrend = calculateTrend(weeklyData, 'commits');
   const hoursTrend = calculateTrend(weeklyData, 'hours');
 
-  // Calculate trend-based pulse score
+  // Calculate trend-based pulse score with target awareness
   const { pulseScore, trendScore } = calculateTrendBasedPulseScore(
     commitTrend,
     hoursTrend,
+    targetWeeklyHours,
     config
   );
 

@@ -1,11 +1,12 @@
 import { DashboardData } from '@/app/lib/server-data';
+import { ProjectOverviewChart } from './ProjectOverviewChart';
 
 interface SummaryStatsProps {
   data: DashboardData;
 }
 
 export default function SummaryStats({ data }: SummaryStatsProps) {
-  const { summary, lastUpdated } = data;
+  const { summary, lastUpdated, projects } = data;
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
@@ -133,6 +134,21 @@ export default function SummaryStats({ data }: SummaryStatsProps) {
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 font-medium flex items-center justify-center gap-1">
               {getTrendEmoji('declining')} Declining
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Project Targets Overview Chart */}
+      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          🎯 Project Targets vs Recent Performance
+        </h3>
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+          <ProjectOverviewChart projects={projects} height={250} />
+          <div className="mt-4 text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Bars show recent average hours/week • Dashed lines show individual targets (8h each)
             </div>
           </div>
         </div>

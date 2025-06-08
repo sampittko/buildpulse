@@ -82,11 +82,12 @@ function calculateTrendDirection(recent: number, longer: number): {
 }
 
 /**
- * Calculate enhanced pulse score based on trends
+ * Calculate enhanced pulse score based on trends and target hours
  */
 export function calculateTrendBasedPulseScore(
   commitTrend: TrendData,
   hoursTrend: TrendData,
+  targetWeeklyHours: number,
   config: {
     commitWeight: number;
     hoursWeight: number;
@@ -94,6 +95,8 @@ export function calculateTrendBasedPulseScore(
     mediumWeight: number;
     longerWeight: number;
     trendWeight: number;
+    targetCompletionBonus: number;
+    targetCompletionPenalty: number;
   }
 ): { pulseScore: number; trendScore: number } {
   // Base score using weighted averages of different time periods
@@ -115,10 +118,43 @@ export function calculateTrendBasedPulseScore(
 
   const trendScore = baseScore * ((commitTrendMultiplier + hoursTrendMultiplier) / 2) * config.trendWeight;
 
+  // Target completion adjustment
+  const targetCompletion = targetWeeklyHours > 0 ? (hoursTrend.recent / targetWeeklyHours) : 1;
+  const targetAdjustment = calculateTargetAdjustment(
+    targetCompletion,
+    config.targetCompletionBonus,
+    config.targetCompletionPenalty
+  );
+
+  const finalScore = (baseScore + trendScore) * targetAdjustment;
+
   return {
-    pulseScore: baseScore + trendScore,
+    pulseScore: Math.max(0, finalScore), // Ensure non-negative
     trendScore
   };
+}
+
+/**
+ * Calculate target completion adjustment multiplier
+ */
+function calculateTargetAdjustment(
+  targetCompletion: number,
+  bonusMultiplier: number,
+  penaltyMultiplier: number
+): number {
+  if (targetCompletion >= 1.0) {
+    // Meeting or exceeding target - apply bonus
+    const bonus = Math.min((targetCompletion - 1.0) * bonusMultiplier, 0.5); // Max 50% bonus
+    return 1.0 + bonus;
+  } else if (targetCompletion >= 0.7) {
+    // Close to target (70-99%) - neutral
+    return 1.0;
+  } else {
+    // Missing target significantly - apply penalty
+    const shortfall = 1.0 - targetCompletion;
+    const penalty = Math.min(shortfall * penaltyMultiplier, 0.4); // Max 40% penalty
+    return Math.max(0.6, 1.0 - penalty); // Minimum 60% of base score
+  }
 }
 
 /**

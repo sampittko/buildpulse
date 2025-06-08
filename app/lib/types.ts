@@ -9,6 +9,7 @@ export interface Project {
   tags: string[];
   url?: string | null;
   logo?: string | null;
+  targetWeeklyHours: number; // Expected weekly time investment
 }
 
 export interface WeeklyData {
@@ -39,6 +40,9 @@ export interface ProjectPulse {
   trendScore: number; // Additional score based on trends
   healthStatus: 'active' | 'slowing' | 'dormant';
   trendStatus: 'improving' | 'stable' | 'declining';
+  // Target tracking
+  hoursTarget: number; // Target weekly hours (copied from project)
+  hoursProgress: number; // Percentage of target achieved (weeklyHours / hoursTarget * 100)
 }
 
 export interface GitHubCommitData {
@@ -77,4 +81,7 @@ export interface PulseScoreConfig {
   mediumWeight: number; // Weight for last 4 weeks
   longerWeight: number; // Weight for last 12 weeks
   trendWeight: number; // Weight for trend direction
+  // Target-based adjustments
+  targetCompletionBonus: number; // Bonus for meeting target hours
+  targetCompletionPenalty: number; // Penalty for missing target hours
 } 
