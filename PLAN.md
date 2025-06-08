@@ -53,14 +53,14 @@ A personal dashboard that gives you a **health score per project**, based on:
 - Pulse score + health badge
 - Optionally: per-project detail page
 
-### 🧰 Tech Stack (MVP)
+## 🧰 Tech Stack (MVP)
 - Frontend: Next.js (App Router)
 - Data Store:	projects.json + in-memory caching
 - API Layer	GitHub + Toggl APIs via Next.js routes
 - Hosting	Vercel
 - No DB, no Auth, no Prisma in MVP.
 
-### 🧠 Post-MVP Ideas
+## 🧠 Post-MVP Ideas
 - Add auth & DB for multi-user support
 - Add public mode or shareable dashboards
 - Weekly reflection journal per project
@@ -68,7 +68,7 @@ A personal dashboard that gives you a **health score per project**, based on:
 - Activity trends / burn-out detection
 - Notion/Linear integration
 
-### 🧠 Notes for AI & Future Me
+## 🧠 Notes for AI & Future Me
 This is a personal dashboard app for tracking project health via GitHub and Toggl. No users, no login, no DB yet. Projects are defined in projects.json, and live data is fetched via API.
 
 Build this for yourself first. Future versions can scale up.
