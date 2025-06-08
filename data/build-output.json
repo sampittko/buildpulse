@@ -19,8 +19,86 @@
       },
       "weeklyCommits": 0,
       "weeklyHours": 0,
-      "pulseScore": 0,
-      "healthStatus": "dormant"
+      "weeklyData": [
+        {
+          "weekStart": "2025-03-21",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-03-28",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-04-04",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-04-11",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-04-18",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-04-25",
+          "commits": 0,
+          "hours": 0
+        },
+        {
+          "weekStart": "2025-05-02",
+          "commits": 0,
+          "hours": 6.173611111111112
+        },
+        {
+          "weekStart": "2025-05-09",
+          "commits": 0,
+          "hours": 9.816666666666666
+        },
+        {
+          "weekStart": "2025-05-16",
+          "commits": 0,
+          "hours": 5.6688888888888895
+        },
+        {
+          "weekStart": "2025-05-23",
+          "commits": 45,
+          "hours": 20.128333333333334
+        },
+        {
+          "weekStart": "2025-05-30",
+          "commits": 7,
+          "hours": 2.7419444444444445
+        },
+        {
+          "weekStart": "2025-06-06",
+          "commits": 0,
+          "hours": 0
+        }
+      ],
+      "commitTrend": {
+        "recent": 3.5,
+        "medium": 13,
+        "longer": 4.333333333333333,
+        "direction": "decreasing",
+        "changePercentage": -19.230769230769226
+      },
+      "hoursTrend": {
+        "recent": 1.3709722222222223,
+        "medium": 7.1347916666666675,
+        "longer": 3.7107870370370377,
+        "direction": "decreasing",
+        "changePercentage": -63.05440844385114
+      },
+      "pulseScore": 19.46084492877493,
+      "trendScore": 2.5496828917378918,
+      "healthStatus": "slowing",
+      "trendStatus": "declining"
     },
     {
       "project": {
@@ -40,21 +118,102 @@
         "url": null,
         "logo": null
       },
-      "weeklyCommits": 0,
-      "weeklyHours": 0,
-      "pulseScore": 0,
-      "healthStatus": "dormant"
+      "weeklyCommits": 6,
+      "weeklyHours": 0.47444444444444445,
+      "weeklyData": [
+        {
+          "weekStart": "2025-03-21",
+          "commits": 3,
+          "hours": 0.6638888888888889
+        },
+        {
+          "weekStart": "2025-03-28",
+          "commits": 4,
+          "hours": 2.5772222222222223
+        },
+        {
+          "weekStart": "2025-04-04",
+          "commits": 11,
+          "hours": 9.313333333333333
+        },
+        {
+          "weekStart": "2025-04-11",
+          "commits": 8,
+          "hours": 10.93277777777778
+        },
+        {
+          "weekStart": "2025-04-18",
+          "commits": 6,
+          "hours": 7.485555555555555
+        },
+        {
+          "weekStart": "2025-04-25",
+          "commits": 16,
+          "hours": 0.5052777777777778
+        },
+        {
+          "weekStart": "2025-05-02",
+          "commits": 25,
+          "hours": 8.584999999999999
+        },
+        {
+          "weekStart": "2025-05-09",
+          "commits": 7,
+          "hours": 11.179444444444446
+        },
+        {
+          "weekStart": "2025-05-16",
+          "commits": 13,
+          "hours": 4.270833333333333
+        },
+        {
+          "weekStart": "2025-05-23",
+          "commits": 7,
+          "hours": 1.9538888888888888
+        },
+        {
+          "weekStart": "2025-05-30",
+          "commits": 6,
+          "hours": 10.051388888888889
+        },
+        {
+          "weekStart": "2025-06-06",
+          "commits": 6,
+          "hours": 0.47444444444444445
+        }
+      ],
+      "commitTrend": {
+        "recent": 6,
+        "medium": 8,
+        "longer": 9.333333333333334,
+        "direction": "decreasing",
+        "changePercentage": -35.71428571428572
+      },
+      "hoursTrend": {
+        "recent": 5.2629166666666665,
+        "medium": 4.1876388888888885,
+        "longer": 5.666087962962963,
+        "direction": "stable",
+        "changePercentage": -7.115514247778573
+      },
+      "pulseScore": 24.50206416666667,
+      "trendScore": 3.560128981481482,
+      "healthStatus": "slowing",
+      "trendStatus": "declining"
     }
   ],
-  "lastUpdated": "2025-06-08T22:13:16.837Z",
+  "lastUpdated": "2025-06-08T22:31:46.813Z",
   "summary": {
     "totalProjects": 2,
     "publicProjects": 0,
     "privateProjects": 2,
     "activeProjects": 0,
-    "slowingProjects": 0,
-    "dormantProjects": 2,
-    "totalWeeklyCommits": 0,
-    "totalWeeklyHours": 0
+    "slowingProjects": 2,
+    "dormantProjects": 0,
+    "totalWeeklyCommits": 6,
+    "totalWeeklyHours": 0.47444444444444445,
+    "improvingProjects": 0,
+    "decliningProjects": 2,
+    "stableProjects": 0
   }
 }

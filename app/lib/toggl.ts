@@ -1,5 +1,6 @@
-import { TogglTimeData } from './types';
+import { TogglTimeData, WeeklyData } from './types';
 import { getWeekStart, getCurrentWeekDescription } from './date-utils';
+import { generateWeekStarts } from './trend-analysis';
 
 interface TogglTimeEntry {
   id: number;
@@ -17,111 +18,125 @@ interface TogglProject {
 }
 
 /**
- * Fetch time entries from Toggl API for a specific project
+ * Fetch time entries from Toggl API for a specific project with 3-month trend data
  */
 export async function fetchTogglTimeEntries(
   projectId: string,
   apiToken: string
 ): Promise<TogglTimeData> {
   try {
-    // Calculate date 4 weeks ago
-    const fourWeeksAgo = new Date();
-    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-    const startDate = fourWeeksAgo.toISOString().split('T')[0]; // YYYY-MM-DD format
+    // Calculate date 12 weeks ago (3 months)
+    const twelveWeeksAgo = new Date();
+    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84); // 12 weeks * 7 days
+    const startDate = twelveWeeksAgo.toISOString().split('T')[0]; // YYYY-MM-DD format
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Toggl API v9 uses Basic Auth with API token as username and 'api_token' as password
     const auth = Buffer.from(`${apiToken}:api_token`).toString('base64');
-
     const headers = {
       'Authorization': `Basic ${auth}`,
       'Content-Type': 'application/json',
     };
 
-    // Fetch ALL time entries for the date range (API doesn't support project filtering)
+    // Fetch ALL time entries for the date range (Toggl API doesn't support project filtering in URL)
     const url = `https://api.track.toggl.com/api/v9/me/time_entries?start_date=${startDate}&end_date=${today}`;
 
     const response = await fetch(url, { headers });
 
     if (!response.ok) {
-      if (response.status === 403) {
-        console.warn(`Access denied for Toggl API - check API token`);
-        return {
-          projectId,
-          weeklyHours: 0,
-          totalEntries: 0
-        };
-      }
       throw new Error(`Toggl API error: ${response.status} ${response.statusText}`);
     }
 
-    const allTimeEntries: TogglTimeEntry[] = await response.json();
+    const allEntries: TogglTimeEntry[] = await response.json();
 
-    // Filter time entries by project ID (client-side since API doesn't support this)
-    const projectTimeEntries = allTimeEntries.filter(entry =>
+    // Filter entries for this specific project
+    const projectEntries = allEntries.filter(entry =>
       entry.project_id === parseInt(projectId)
     );
 
-    // Calculate weekly hours (current week starting from Saturday)
-    const weekStart = getWeekStart();
+    console.log(`🔍 Toggl: Fetched ${allEntries.length} total entries, ${projectEntries.length} for project ${projectId}`);
 
-    console.log(`📅 Current week: ${getCurrentWeekDescription()}`);
+    // Generate weekly data for the last 12 weeks
+    const weekStarts = generateWeekStarts(12);
+    const weeklyData: WeeklyData[] = weekStarts.map(weekStart => {
+      const weekStartDate = new Date(weekStart);
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekEndDate.getDate() + 7);
 
-    const weeklyEntries = projectTimeEntries.filter(entry => {
-      const entryDate = new Date(entry.start);
-      return entryDate >= weekStart;
+      const weekEntries = projectEntries.filter(entry => {
+        const entryDate = new Date(entry.start);
+        return entryDate >= weekStartDate && entryDate < weekEndDate;
+      });
+
+      const weekHours = weekEntries.reduce((total, entry) => {
+        // Handle negative durations (running timers) by treating them as 0
+        const duration = entry.duration < 0 ? 0 : entry.duration;
+        return total + (duration / 3600); // Convert seconds to hours
+      }, 0);
+
+      return {
+        weekStart,
+        commits: 0, // Will be filled by GitHub data
+        hours: weekHours
+      };
     });
 
-    const weeklyHours = weeklyEntries.reduce((total, entry) => {
+    // Calculate current week hours (for backward compatibility)
+    const currentWeekStart = getWeekStart();
+    const currentWeekEntries = projectEntries.filter(entry => {
+      const entryDate = new Date(entry.start);
+      return entryDate >= currentWeekStart;
+    });
+
+    const weeklyHours = currentWeekEntries.reduce((total, entry) => {
       // Handle negative durations (running timers)
       const duration = entry.duration < 0 ? 0 : entry.duration;
-      // Convert seconds to hours
-      return total + (duration / 3600);
+      return total + (duration / 3600); // Convert seconds to hours
     }, 0);
 
-    // Debug: Show some sample entries
-    if (weeklyEntries.length > 0 && weeklyEntries.length <= 5) {
-      console.log(`🔍 Sample weekly entries for project ${projectId}:`);
-      weeklyEntries.forEach(entry => {
-        const hours = entry.duration / 3600;
-        const date = new Date(entry.start).toISOString().split('T')[0];
-        console.log(`   ${date}: ${hours.toFixed(2)}h - ${entry.description || 'No description'}`);
-      });
-    } else if (weeklyEntries.length > 5) {
-      console.log(`🔍 First 3 weekly entries for project ${projectId} (${weeklyEntries.length} total):`);
-      weeklyEntries.slice(0, 3).forEach(entry => {
-        const hours = entry.duration / 3600;
-        const date = new Date(entry.start).toISOString().split('T')[0];
-        console.log(`   ${date}: ${hours.toFixed(2)}h - ${entry.description || 'No description'}`);
-      });
+    // Debug: Show sample entries for current week
+    if (currentWeekEntries.length > 0) {
+      const sampleEntry = currentWeekEntries[0];
+      const sampleDate = new Date(sampleEntry.start).toISOString().split('T')[0];
+      const sampleHours = (sampleEntry.duration < 0 ? 0 : sampleEntry.duration) / 3600;
+      console.log(`🔍 Sample weekly entries: ${sampleDate}: ${sampleHours.toFixed(2)}h - ${sampleEntry.description || 'No description'}`);
     }
 
-    console.log(`✅ Fetched ${allTimeEntries.length} total entries, filtered to ${projectTimeEntries.length} for project ${projectId}, ${weeklyEntries.length} this week (${weeklyHours.toFixed(2)}h this week)`);
+    console.log(`✅ Toggl: Project ${projectId} has ${projectEntries.length} entries over 12 weeks, ${weeklyHours.toFixed(2)}h this week ${getCurrentWeekDescription()}`);
 
     return {
       projectId,
-      weeklyHours: Math.round(weeklyHours * 100) / 100, // Round to 2 decimal places
-      totalEntries: projectTimeEntries.length
+      weeklyHours,
+      totalEntries: projectEntries.length,
+      weeklyData
     };
 
   } catch (error) {
     console.error(`❌ Error fetching Toggl data for project ${projectId}:`, error);
+
+    // Return empty data structure
+    const weekStarts = generateWeekStarts(12);
+    const weeklyData: WeeklyData[] = weekStarts.map(weekStart => ({
+      weekStart,
+      commits: 0,
+      hours: 0
+    }));
+
     return {
       projectId,
       weeklyHours: 0,
-      totalEntries: 0
+      totalEntries: 0,
+      weeklyData
     };
   }
 }
 
 /**
- * Fetch user's Toggl projects to validate project IDs
+ * Get available Toggl projects
  */
-export async function fetchTogglProjects(apiToken: string): Promise<TogglProject[]> {
+export async function getTogglProjects(apiToken: string): Promise<TogglProject[]> {
   try {
     const auth = Buffer.from(`${apiToken}:api_token`).toString('base64');
-
     const headers = {
       'Authorization': `Basic ${auth}`,
       'Content-Type': 'application/json',
@@ -134,12 +149,10 @@ export async function fetchTogglProjects(apiToken: string): Promise<TogglProject
     }
 
     const projects: TogglProject[] = await response.json();
-    console.log(`✅ Fetched ${projects.length} Toggl projects`);
-
     return projects;
 
   } catch (error) {
-    console.error('❌ Error fetching Toggl projects:', error);
+    console.error('Error fetching Toggl projects:', error);
     return [];
   }
 }
@@ -152,7 +165,7 @@ export async function validateTogglProjectId(
   apiToken: string
 ): Promise<boolean> {
   try {
-    const projects = await fetchTogglProjects(apiToken);
+    const projects = await getTogglProjects(apiToken);
     return projects.some(project => project.id.toString() === projectId);
   } catch (error) {
     console.error(`Error validating Toggl project ID ${projectId}:`, error);
@@ -168,7 +181,7 @@ export async function getTogglProjectName(
   apiToken: string
 ): Promise<string | null> {
   try {
-    const projects = await fetchTogglProjects(apiToken);
+    const projects = await getTogglProjects(apiToken);
     const project = projects.find(p => p.id.toString() === projectId);
     return project?.name || null;
   } catch (error) {

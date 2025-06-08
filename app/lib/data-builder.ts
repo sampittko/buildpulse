@@ -2,12 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import {
   loadProjects,
-  calculatePulseScore,
-  getHealthStatus
+  calculateEnhancedPulseScore,
+  getEnhancedHealthStatus,
+  mergeWeeklyData
 } from './projects';
 import { fetchProjectGitHubData } from './github';
 import { fetchTogglTimeEntries } from './toggl';
 import { ProjectPulse } from './types';
+import { getTrendStatus } from './trend-analysis';
 
 interface BuildData {
   projects: ProjectPulse[];
@@ -21,95 +23,131 @@ interface BuildData {
     dormantProjects: number;
     totalWeeklyCommits: number;
     totalWeeklyHours: number;
+    improvingProjects: number;
+    decliningProjects: number;
+    stableProjects: number;
   };
 }
 
 /**
- * Build all project pulse data by fetching from GitHub and Toggl APIs
+ * Build all project pulse data by fetching from GitHub and Toggl APIs with trend analysis
  */
 export async function buildProjectPulseData(): Promise<BuildData> {
-  console.log('🚀 Starting BuildPulse data generation...');
+  console.log('🚀 Building project pulse data with 3-month trend analysis...');
 
-  const startTime = Date.now();
   const projects = loadProjects();
-
   const githubToken = process.env.GITHUB_TOKEN;
   const togglToken = process.env.TOGGL_API_TOKEN;
 
   if (!githubToken) {
-    console.warn('⚠️  GITHUB_TOKEN not found - GitHub data will be limited to public repos');
+    console.warn('⚠️  No GITHUB_TOKEN found in environment variables');
   }
 
   if (!togglToken) {
-    console.warn('⚠️  TOGGL_API_TOKEN not found - Toggl data will be unavailable');
+    console.warn('⚠️  No TOGGL_API_TOKEN found in environment variables');
   }
 
   const projectPulses: ProjectPulse[] = [];
 
-  // Process each project
   for (const project of projects) {
     console.log(`\n📊 Processing project: ${project.name}`);
 
-    // Fetch GitHub data
+    // Fetch GitHub data (combines public and private repos)
+    const allGitHubRepos = [
+      ...(project.githubRepo || []),
+      ...(project.githubRepoPrivate || [])
+    ];
+
     const githubData = await fetchProjectGitHubData(
       project.name,
-      project.githubRepo,
+      allGitHubRepos,
       githubToken
     );
 
     // Fetch Toggl data
-    let togglData = { projectId: project.togglProjectId, weeklyHours: 0, totalEntries: 0 };
-    if (togglToken && project.togglProjectId.trim()) {
+    let togglData;
+    if (project.togglProjectId && togglToken) {
       togglData = await fetchTogglTimeEntries(project.togglProjectId, togglToken);
+    } else {
+      // Create empty Toggl data structure
+      togglData = {
+        projectId: project.togglProjectId || '',
+        weeklyHours: 0,
+        totalEntries: 0,
+        weeklyData: githubData.weeklyData.map(week => ({
+          ...week,
+          hours: 0
+        }))
+      };
     }
 
-    // Calculate pulse score
-    const pulseScore = calculatePulseScore(
-      githubData.totalWeeklyCommits,
-      togglData.weeklyHours
-    );
+    // Merge GitHub and Toggl weekly data
+    const mergedWeeklyData = mergeWeeklyData(githubData.weeklyData, togglData.weeklyData);
 
-    // Determine health status
-    const healthStatus = getHealthStatus(pulseScore);
+    // Calculate enhanced pulse score with trends
+    const {
+      pulseScore,
+      trendScore,
+      commitTrend,
+      hoursTrend,
+      weeklyCommits,
+      weeklyHours
+    } = calculateEnhancedPulseScore(mergedWeeklyData);
+
+    // Determine health status with trend consideration
+    const healthStatus = getEnhancedHealthStatus(pulseScore, commitTrend, hoursTrend);
+
+    // Determine trend status
+    const trendStatus = getTrendStatus(commitTrend, hoursTrend);
 
     const projectPulse: ProjectPulse = {
       project,
-      weeklyCommits: githubData.totalWeeklyCommits,
-      weeklyHours: togglData.weeklyHours,
+      weeklyCommits,
+      weeklyHours,
+      weeklyData: mergedWeeklyData,
+      commitTrend,
+      hoursTrend,
       pulseScore,
-      healthStatus
+      trendScore,
+      healthStatus,
+      trendStatus
     };
 
     projectPulses.push(projectPulse);
 
-    console.log(`   ${getHealthEmoji(healthStatus)} ${project.name}: ${pulseScore.toFixed(1)} (${githubData.totalWeeklyCommits} commits, ${togglData.weeklyHours}h)`);
+    // Log trend information
+    console.log(`  📈 Commits trend: ${commitTrend.direction} (${commitTrend.changePercentage.toFixed(1)}%)`);
+    console.log(`  ⏱️  Hours trend: ${hoursTrend.direction} (${hoursTrend.changePercentage.toFixed(1)}%)`);
+    console.log(`  💯 Pulse score: ${pulseScore.toFixed(1)} (trend: ${trendScore.toFixed(1)})`);
+    console.log(`  🎯 Status: ${healthStatus} (trending ${trendStatus})`);
   }
 
   // Calculate summary statistics
   const summary = {
     totalProjects: projectPulses.length,
-    publicProjects: projectPulses.filter(p => p.project.githubRepo && p.project.githubRepo.length > 0).length,
-    privateProjects: projectPulses.filter(p => p.project.githubRepoPrivate && p.project.githubRepoPrivate.length > 0).length,
+    publicProjects: projects.filter(p => p.githubRepo && p.githubRepo.length > 0).length,
+    privateProjects: projects.filter(p => p.githubRepoPrivate && p.githubRepoPrivate.length > 0).length,
     activeProjects: projectPulses.filter(p => p.healthStatus === 'active').length,
     slowingProjects: projectPulses.filter(p => p.healthStatus === 'slowing').length,
     dormantProjects: projectPulses.filter(p => p.healthStatus === 'dormant').length,
     totalWeeklyCommits: projectPulses.reduce((sum, p) => sum + p.weeklyCommits, 0),
-    totalWeeklyHours: Math.round(projectPulses.reduce((sum, p) => sum + p.weeklyHours, 0) * 100) / 100
+    totalWeeklyHours: projectPulses.reduce((sum, p) => sum + p.weeklyHours, 0),
+    improvingProjects: projectPulses.filter(p => p.trendStatus === 'improving').length,
+    decliningProjects: projectPulses.filter(p => p.trendStatus === 'declining').length,
+    stableProjects: projectPulses.filter(p => p.trendStatus === 'stable').length,
   };
 
+  console.log(`\n📊 Summary:`);
+  console.log(`   📁 Repos: ${summary.publicProjects} public, ${summary.privateProjects} private`);
+  console.log(`   🎯 Health: ${summary.activeProjects} active, ${summary.slowingProjects} slowing, ${summary.dormantProjects} dormant`);
+  console.log(`   📈 Trends: ${summary.improvingProjects} improving, ${summary.stableProjects} stable, ${summary.decliningProjects} declining`);
+  console.log(`   💻 Activity: ${summary.totalWeeklyCommits} commits, ${summary.totalWeeklyHours.toFixed(1)}h this week`);
+
   const buildData: BuildData = {
-    projects: projectPulses.sort((a, b) => b.pulseScore - a.pulseScore), // Sort by pulse score descending
+    projects: projectPulses,
     lastUpdated: new Date().toISOString(),
     summary
   };
-
-  const endTime = Date.now();
-  const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-  console.log(`\n✅ BuildPulse data generation completed in ${duration}s`);
-  console.log(`📈 Summary: ${summary.activeProjects} active, ${summary.slowingProjects} slowing, ${summary.dormantProjects} dormant`);
-  console.log(`💻 Total: ${summary.totalWeeklyCommits} commits, ${summary.totalWeeklyHours}h this week`);
-  console.log(`📁 Repos: ${summary.publicProjects} public, ${summary.privateProjects} private`);
 
   return buildData;
 }
@@ -117,20 +155,18 @@ export async function buildProjectPulseData(): Promise<BuildData> {
 /**
  * Save build data to JSON file
  */
-export async function saveBuildData(buildData: BuildData): Promise<void> {
+export function saveBuildData(buildData: BuildData): void {
   const outputPath = path.join(process.cwd(), 'data', 'build-output.json');
 
-  try {
-    await fs.promises.writeFile(
-      outputPath,
-      JSON.stringify(buildData, null, 2),
-      'utf8'
-    );
-    console.log(`💾 Build data saved to ${outputPath}`);
-  } catch (error) {
-    console.error('❌ Error saving build data:', error);
-    throw error;
+  // Ensure data directory exists
+  const dataDir = path.dirname(outputPath);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
   }
+
+  // Save with pretty formatting
+  fs.writeFileSync(outputPath, JSON.stringify(buildData, null, 2));
+  console.log(`💾 Build data saved to ${outputPath}`);
 }
 
 /**

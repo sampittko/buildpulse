@@ -1,5 +1,6 @@
-import { GitHubCommitData, ProjectGitHubData } from './types';
+import { GitHubCommitData, ProjectGitHubData, WeeklyData } from './types';
 import { getWeekStart } from './date-utils';
+import { generateWeekStarts } from './trend-analysis';
 
 interface GitHubCommit {
   sha: string;
@@ -11,7 +12,7 @@ interface GitHubCommit {
 }
 
 /**
- * Fetch commits from GitHub API for a specific repository
+ * Fetch commits from GitHub API for a specific repository with 3-month trend data
  */
 export async function fetchGitHubCommits(
   owner: string,
@@ -21,10 +22,10 @@ export async function fetchGitHubCommits(
   const repoName = `${owner}/${repo}`;
 
   try {
-    // Calculate date 4 weeks ago
-    const fourWeeksAgo = new Date();
-    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-    const since = fourWeeksAgo.toISOString();
+    // Calculate date 12 weeks ago (3 months)
+    const twelveWeeksAgo = new Date();
+    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84); // 12 weeks * 7 days
+    const since = twelveWeeksAgo.toISOString();
 
     const headers: Record<string, string> = {
       'Accept': 'application/vnd.github.v3+json',
@@ -35,51 +36,83 @@ export async function fetchGitHubCommits(
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const url = `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&per_page=100`;
+    const url = `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&per_page=300`;
 
     const response = await fetch(url, { headers });
 
     if (!response.ok) {
       if (response.status === 404) {
         console.warn(`Repository ${repoName} not found or not accessible`);
-        return {
-          repoName,
-          weeklyCommits: 0,
-          lastCommitDate: null
-        };
+        return createEmptyCommitData(repoName);
       }
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
     }
 
     const commits: GitHubCommit[] = await response.json();
 
-    // Calculate weekly commits (current week starting from Saturday)
-    const weekStart = getWeekStart();
+    // Generate weekly data for the last 12 weeks
+    const weekStarts = generateWeekStarts(12);
+    const weeklyData: WeeklyData[] = weekStarts.map(weekStart => {
+      const weekStartDate = new Date(weekStart);
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekEndDate.getDate() + 7);
 
+      const weekCommits = commits.filter(commit => {
+        const commitDate = new Date(commit.commit.author.date);
+        return commitDate >= weekStartDate && commitDate < weekEndDate;
+      }).length;
+
+      return {
+        weekStart,
+        commits: weekCommits,
+        hours: 0 // Will be filled by Toggl data
+      };
+    });
+
+    // Calculate current week commits (for backward compatibility)
+    const currentWeekStart = getWeekStart();
     const weeklyCommits = commits.filter(commit =>
-      new Date(commit.commit.author.date) >= weekStart
+      new Date(commit.commit.author.date) >= currentWeekStart
     ).length;
 
     const lastCommitDate = commits.length > 0
       ? commits[0].commit.author.date
       : null;
 
-    console.log(`✅ Fetched ${commits.length} total commits for ${repoName} (${weeklyCommits} this week since Saturday)`);
+    console.log(`✅ Fetched ${commits.length} total commits for ${repoName} over 12 weeks (${weeklyCommits} this week)`);
 
     return {
       repoName,
       weeklyCommits,
-      lastCommitDate
+      lastCommitDate,
+      weeklyData,
+      totalCommits: commits.length
     };
 
   } catch (error) {
     console.error(`❌ Error fetching commits for ${repoName}:`, error);
-    return {
-      repoName,
-      weeklyCommits: 0,
-      lastCommitDate: null
-    };
+    return createEmptyCommitData(repoName);
   }
+}
+
+/**
+ * Create empty commit data structure
+ */
+function createEmptyCommitData(repoName: string): GitHubCommitData {
+  const weekStarts = generateWeekStarts(12);
+  const weeklyData: WeeklyData[] = weekStarts.map(weekStart => ({
+    weekStart,
+    commits: 0,
+    hours: 0
+  }));
+
+  return {
+    repoName,
+    weeklyCommits: 0,
+    lastCommitDate: null,
+    weeklyData,
+    totalCommits: 0
+  };
 }
 
 /**
@@ -91,10 +124,18 @@ export async function fetchProjectGitHubData(
   token?: string
 ): Promise<ProjectGitHubData> {
   if (!repositories || repositories.length === 0) {
+    const weekStarts = generateWeekStarts(12);
+    const weeklyData: WeeklyData[] = weekStarts.map(weekStart => ({
+      weekStart,
+      commits: 0,
+      hours: 0
+    }));
+
     return {
       projectName,
       repositories: [],
-      totalWeeklyCommits: 0
+      totalWeeklyCommits: 0,
+      weeklyData
     };
   }
 
@@ -102,11 +143,7 @@ export async function fetchProjectGitHubData(
     const [owner, repo] = repoPath.split('/');
     if (!owner || !repo) {
       console.warn(`Invalid repository path: ${repoPath}`);
-      return {
-        repoName: repoPath,
-        weeklyCommits: 0,
-        lastCommitDate: null
-      };
+      return createEmptyCommitData(repoPath);
     }
 
     return fetchGitHubCommits(owner, repo, token);
@@ -115,10 +152,26 @@ export async function fetchProjectGitHubData(
   const repoData = await Promise.all(repoPromises);
   const totalWeeklyCommits = repoData.reduce((sum, repo) => sum + repo.weeklyCommits, 0);
 
+  // Combine weekly data from all repositories
+  const weekStarts = generateWeekStarts(12);
+  const combinedWeeklyData: WeeklyData[] = weekStarts.map(weekStart => {
+    const totalCommits = repoData.reduce((sum, repo) => {
+      const weekData = repo.weeklyData.find(w => w.weekStart === weekStart);
+      return sum + (weekData?.commits || 0);
+    }, 0);
+
+    return {
+      weekStart,
+      commits: totalCommits,
+      hours: 0 // Will be filled by Toggl data
+    };
+  });
+
   return {
     projectName,
     repositories: repoData,
-    totalWeeklyCommits
+    totalWeeklyCommits,
+    weeklyData: combinedWeeklyData
   };
 }
 

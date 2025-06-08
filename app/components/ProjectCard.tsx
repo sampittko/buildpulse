@@ -17,6 +17,19 @@ function getHealthColor(status: string): string {
   }
 }
 
+function getTrendColor(status: string): string {
+  switch (status) {
+    case 'improving':
+      return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20';
+    case 'declining':
+      return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20';
+    case 'stable':
+      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800';
+    default:
+      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800';
+  }
+}
+
 function getHealthEmoji(status: string): string {
   switch (status) {
     case 'active':
@@ -30,8 +43,37 @@ function getHealthEmoji(status: string): string {
   }
 }
 
+function getTrendEmoji(status: string): string {
+  switch (status) {
+    case 'improving':
+      return '📈';
+    case 'declining':
+      return '📉';
+    case 'stable':
+      return '➡️';
+    default:
+      return '➡️';
+  }
+}
+
+function formatTrendChange(percentage: number): string {
+  const abs = Math.abs(percentage);
+  const sign = percentage >= 0 ? '+' : '';
+  return `${sign}${abs.toFixed(1)}%`;
+}
+
 export default function ProjectCard({ pulse }: ProjectCardProps) {
-  const { project, weeklyCommits, weeklyHours, pulseScore, healthStatus } = pulse;
+  const {
+    project,
+    weeklyCommits,
+    weeklyHours,
+    pulseScore,
+    trendScore,
+    healthStatus,
+    trendStatus,
+    commitTrend,
+    hoursTrend
+  } = pulse;
 
   const formatTags = (tags: string[]) => {
     return tags.join(', ');
@@ -71,8 +113,13 @@ export default function ProjectCard({ pulse }: ProjectCardProps) {
             {project.description}
           </p>
         </div>
-        <div className={`px-3 py-1.5 rounded-full border text-sm font-medium ${getHealthColor(healthStatus)}`}>
-          {getHealthEmoji(healthStatus)} {healthStatus.charAt(0).toUpperCase() + healthStatus.slice(1)}
+        <div className="flex flex-col gap-2 ml-4">
+          <div className={`px-3 py-1.5 rounded-full border text-sm font-medium ${getHealthColor(healthStatus)}`}>
+            {getHealthEmoji(healthStatus)} {healthStatus.charAt(0).toUpperCase() + healthStatus.slice(1)}
+          </div>
+          <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${getTrendColor(trendStatus)}`}>
+            {getTrendEmoji(trendStatus)} {trendStatus.charAt(0).toUpperCase() + trendStatus.slice(1)}
+          </div>
         </div>
       </div>
 
@@ -86,7 +133,7 @@ export default function ProjectCard({ pulse }: ProjectCardProps) {
         </div>
       )}
 
-      {/* Metrics */}
+      {/* Current Week Metrics */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center">
           <div className="text-lg font-bold font-mono text-gray-900 dark:text-gray-100">
@@ -110,6 +157,44 @@ export default function ProjectCard({ pulse }: ProjectCardProps) {
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
             Pulse Score
+          </div>
+        </div>
+      </div>
+
+      {/* Trend Analysis */}
+      <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mb-4">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+          3-Month Trends
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Commits</span>
+              <span className={`text-xs font-medium ${commitTrend.direction === 'increasing' ? 'text-green-600 dark:text-green-400' :
+                commitTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
+                  'text-gray-600 dark:text-gray-400'
+                }`}>
+                {formatTrendChange(commitTrend.changePercentage)}
+              </span>
+            </div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="font-mono">{commitTrend.recent.toFixed(1)}</span> avg/week
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Hours</span>
+              <span className={`text-xs font-medium ${hoursTrend.direction === 'increasing' ? 'text-green-600 dark:text-green-400' :
+                hoursTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
+                  'text-gray-600 dark:text-gray-400'
+                }`}>
+                {formatTrendChange(hoursTrend.changePercentage)}
+              </span>
+            </div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="font-mono">{hoursTrend.recent.toFixed(1)}h</span> avg/week
+            </div>
           </div>
         </div>
       </div>
