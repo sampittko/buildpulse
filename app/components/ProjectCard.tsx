@@ -20,13 +20,13 @@ function getHealthColor(status: string): string {
 function getTrendColor(status: string): string {
   switch (status) {
     case 'improving':
-      return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20';
+      return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800';
     case 'declining':
-      return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20';
+      return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800';
     case 'stable':
-      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800';
+      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700';
     default:
-      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800';
+      return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700';
   }
 }
 
@@ -167,12 +167,12 @@ export default function ProjectCard({ pulse }: ProjectCardProps) {
           3-Month Trends
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Commits</span>
               <span className={`text-xs font-medium ${commitTrend.direction === 'increasing' ? 'text-green-600 dark:text-green-400' :
-                commitTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
-                  'text-gray-600 dark:text-gray-400'
+                  commitTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
+                    'text-gray-600 dark:text-gray-400'
                 }`}>
                 {formatTrendChange(commitTrend.changePercentage)}
               </span>
@@ -182,12 +182,12 @@ export default function ProjectCard({ pulse }: ProjectCardProps) {
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Hours</span>
               <span className={`text-xs font-medium ${hoursTrend.direction === 'increasing' ? 'text-green-600 dark:text-green-400' :
-                hoursTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
-                  'text-gray-600 dark:text-gray-400'
+                  hoursTrend.direction === 'decreasing' ? 'text-red-600 dark:text-red-400' :
+                    'text-gray-600 dark:text-gray-400'
                 }`}>
                 {formatTrendChange(hoursTrend.changePercentage)}
               </span>

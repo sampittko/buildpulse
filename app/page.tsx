@@ -1,6 +1,5 @@
 import { getDashboardData } from '@/app/lib/server-data';
 import DashboardClient from '@/app/components/DashboardClient';
-import { ThemeToggle } from '@/app/components/ThemeToggle';
 
 export default function Home() {
   const data = getDashboardData();
@@ -18,7 +17,6 @@ export default function Home() {
               Track the pulse of your personal projects
             </p>
           </div>
-          <ThemeToggle />
         </div>
 
         <DashboardClient initialData={data} />

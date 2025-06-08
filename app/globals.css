@@ -62,11 +62,28 @@
   }
 
   code {
-    @apply font-mono text-sm bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-md;
+    font-family: var(--font-jetbrains-mono), 'Fira Code', 'Consolas', monospace;
+    font-size: theme('fontSize.sm');
+    background-color: theme('colors.gray.100');
+    padding: theme('spacing.1.5') theme('spacing.1.5');
+    border-radius: theme('borderRadius.md');
+  }
+
+  .dark code {
+    background-color: theme('colors.gray.800');
   }
 
   pre {
-    @apply font-mono text-sm bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto;
+    font-family: var(--font-jetbrains-mono), 'Fira Code', 'Consolas', monospace;
+    font-size: theme('fontSize.sm');
+    background-color: theme('colors.gray.100');
+    padding: theme('spacing.4');
+    border-radius: theme('borderRadius.lg');
+    overflow-x: auto;
+  }
+
+  .dark pre {
+    background-color: theme('colors.gray.800');
   }
 }
 
