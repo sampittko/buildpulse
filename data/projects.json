@@ -1,5 +1,16 @@
 [
   {
+    "name": "BuildPulse",
+    "description": "My personal dashboard to track my projects and their health",
+    "githubRepo": ["sampittko/buildpulse"],
+    "togglProjectId": "211809379",
+    "startYear": 2025,
+    "endYear": null,
+    "tags": ["Hobby"],
+    "url": null,
+    "logo": null
+  },
+  {
     "name": "fwt. axis",
     "description": "My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track",
     "githubRepo": ["sampittko/fwt-axis"],

@@ -2,6 +2,27 @@
   "projects": [
     {
       "project": {
+        "name": "BuildPulse",
+        "description": "My personal dashboard to track my projects and their health",
+        "githubRepo": [
+          "sampittko/buildpulse"
+        ],
+        "togglProjectId": "211809379",
+        "startYear": 2025,
+        "endYear": null,
+        "tags": [
+          "Hobby"
+        ],
+        "url": null,
+        "logo": null
+      },
+      "weeklyCommits": 7,
+      "weeklyHours": 0.16,
+      "pulseScore": 10.82,
+      "healthStatus": "active"
+    },
+    {
+      "project": {
         "name": "Secret project",
         "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
         "githubRepo": [
@@ -109,13 +130,13 @@
       "healthStatus": "dormant"
     }
   ],
-  "lastUpdated": "2025-06-08T21:32:44.347Z",
+  "lastUpdated": "2025-06-08T21:42:37.176Z",
   "summary": {
-    "totalProjects": 5,
-    "activeProjects": 0,
+    "totalProjects": 6,
+    "activeProjects": 1,
     "slowingProjects": 0,
     "dormantProjects": 5,
-    "totalWeeklyCommits": 3,
-    "totalWeeklyHours": 0.8
+    "totalWeeklyCommits": 10,
+    "totalWeeklyHours": 0.96
   }
 }
