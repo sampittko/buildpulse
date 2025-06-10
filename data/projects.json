@@ -1,0 +1,28 @@
+[
+  {
+    "name": "fwt. axis",
+    "description": "My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track",
+    "githubRepo": null,
+    "githubRepoPrivate": ["sampittko/fwt-axis"],
+    "togglProjectId": "211046031",
+    "startYear": 2025,
+    "endYear": null,
+    "tags": ["Indie"],
+    "url": "https://fwt.wtf/track-reflect-repeat?utm_source=samuelpitonak.sk",
+    "logo": null,
+    "targetWeeklyHours": 8
+  },
+  {
+    "name": "Secret project",
+    "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
+    "githubRepo": null,
+    "githubRepoPrivate": ["extropysk/hookers", "extropysk/hookers-frontend"],
+    "togglProjectId": "206566140",
+    "startYear": 2024,
+    "endYear": null,
+    "tags": ["Entrepreneurship"],
+    "url": null,
+    "logo": null,
+    "targetWeeklyHours": 8
+  }
+] 
