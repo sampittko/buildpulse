@@ -10,7 +10,7 @@ const projectsData = [
     "name": "fwt. axis",
     "description": "My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track",
     "githubRepo": null,
-    "githubRepoPrivate": ["sampittko/fwt-axis"],
+    "githubRepoPrivate": ["sampittko/fwtaxis"],
     "togglProjectId": "211046031",
     "startYear": 2025,
     "endYear": null,
