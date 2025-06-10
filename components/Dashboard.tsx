@@ -1,21 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ProjectPulse from './ProjectPulse';
-import { Project, ProjectHealth, GitHubCommit, TogglTimeEntry } from '../lib/types';
+import { ProjectHealth, GitHubCommit, TogglTimeEntry } from '../lib/types';
 import { calculateProjectHealth, getCurrentWeekBounds } from '../lib/utils';
 import projectsData from '../data/projects.json';
 
 export default function Dashboard() {
   const [projectHealths, setProjectHealths] = useState<ProjectHealth[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
-  // Calculate health for each project
-  useEffect(() => {
-
-    const fetchProjectHealth = async () => {
+  // Fetch project health data
+  const fetchProjectHealth = useCallback(async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setSyncing(true);
+    } else {
       setLoading(true);
+    }
+    setError(null);
+
+    try {
       const healthPromises = projectsData.map(async (project) => {
         try {
           // Fetch GitHub commits for all repos (public and private)
@@ -60,21 +67,51 @@ export default function Dashboard() {
         }
       });
 
-      try {
-        const healths = await Promise.all(healthPromises);
-        setProjectHealths(healths);
-      } catch {
-        setError('Failed to calculate project health');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjectHealth();
+      const healths = await Promise.all(healthPromises);
+      setProjectHealths(healths);
+      setLastRefresh(new Date());
+    } catch {
+      setError('Failed to calculate project health');
+    } finally {
+      setLoading(false);
+      setSyncing(false);
+    }
   }, []);
+
+  // Manual refresh function
+  const handleManualRefresh = () => {
+    fetchProjectHealth(true);
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchProjectHealth(false);
+  }, [fetchProjectHealth]);
+
+  // Auto-refresh every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProjectHealth(true);
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(interval);
+  }, [fetchProjectHealth]);
 
   const { start, end } = getCurrentWeekBounds();
   const weekStr = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+
+  const formatLastRefresh = (date: Date) => {
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   if (error) {
     return (
@@ -84,7 +121,13 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Something went wrong
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">{error}</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={handleManualRefresh}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -104,13 +147,42 @@ export default function Dashboard() {
                 Project health dashboard for the week of {weekStr}
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Week starts Saturday
+            <div className="flex items-center gap-4">
+              {/* Sync Status */}
+              <div className="text-right">
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  {syncing ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                      <span>Syncing...</span>
+                    </>
+                  ) : lastRefresh ? (
+                    <>
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Last sync: {formatLastRefresh(lastRefresh)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      <span>Never synced</span>
+                    </>
+                  )}
+                </div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                  {projectHealths.filter(h => h.status === 'excellent' || h.status === 'good').length} / {projectHealths.length} healthy
+                </div>
               </div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {projectHealths.filter(h => h.status === 'excellent' || h.status === 'good').length} / {projectHealths.length} healthy
-              </div>
+              {/* Refresh Button */}
+              <button
+                onClick={handleManualRefresh}
+                disabled={syncing}
+                className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <div className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`}>
+                  🔄
+                </div>
+                Refresh
+              </button>
             </div>
           </div>
         </div>
@@ -138,9 +210,16 @@ export default function Dashboard() {
 
             {/* Summary */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                📊 Weekly Summary
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  📊 Weekly Summary
+                </h2>
+                {lastRefresh && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Auto-refresh every 10 minutes
+                  </div>
+                )}
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
