@@ -4,7 +4,35 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ProjectPulse from './ProjectPulse';
 import { ProjectHealth, GitHubCommit, TogglTimeEntry } from '../lib/types';
 import { calculateProjectHealth, getCurrentWeekBounds } from '../lib/utils';
-import projectsData from '../data/projects.json';
+// Import projects data
+const projectsData = [
+  {
+    "name": "fwt. axis",
+    "description": "My self-awareness habit framework on iOS with integrations to Apple Health and Toggl Track",
+    "githubRepo": null,
+    "githubRepoPrivate": ["sampittko/fwt-axis"],
+    "togglProjectId": "211046031",
+    "startYear": 2025,
+    "endYear": null,
+    "tags": ["Indie"],
+    "url": "https://fwt.wtf/track-reflect-repeat?utm_source=samuelpitonak.sk",
+    "logo": null,
+    "targetWeeklyHours": 8
+  },
+  {
+    "name": "Secret project",
+    "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
+    "githubRepo": null,
+    "githubRepoPrivate": ["extropysk/hookers", "extropysk/hookers-frontend"],
+    "togglProjectId": "206566140",
+    "startYear": 2024,
+    "endYear": null,
+    "tags": ["Entrepreneurship"],
+    "url": null,
+    "logo": null,
+    "targetWeeklyHours": 8
+  }
+];
 
 export default function Dashboard() {
   const [projectHealths, setProjectHealths] = useState<ProjectHealth[]>([]);
@@ -82,6 +110,8 @@ export default function Dashboard() {
   const handleManualRefresh = () => {
     fetchProjectHealth(true);
   };
+
+
 
   // Initial load
   useEffect(() => {
@@ -172,6 +202,7 @@ export default function Dashboard() {
                   {projectHealths.filter(h => h.status === 'excellent' || h.status === 'good').length} / {projectHealths.length} healthy
                 </div>
               </div>
+
               {/* Refresh Button */}
               <button
                 onClick={handleManualRefresh}
@@ -207,6 +238,8 @@ export default function Dashboard() {
                 <ProjectPulse key={index} health={health} />
               ))}
             </div>
+
+
 
             {/* Summary */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">

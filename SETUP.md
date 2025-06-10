@@ -10,6 +10,11 @@ Create a `.env.local` file in the root directory with your API tokens:
 # Grant access to your repositories with "Contents" and "Metadata" permissions
 GITHUB_TOKEN=your_github_token_here
 
+# Your GitHub Username (to filter commits to only yours)
+# This should be your exact GitHub username (case-sensitive)
+# OPTIONAL: If not provided, will auto-detect from your GitHub token
+GITHUB_USERNAME=your_github_username_here
+
 # Toggl Track API Token  
 # Go to: Toggl Track → Profile → API Token (at the bottom)
 TOGGL_API_TOKEN=your_toggl_api_token_here
@@ -68,9 +73,9 @@ You can modify the health calculation algorithm in `lib/utils.ts` by adjusting:
 
 ## 📝 Adding Projects
 
-Edit `data/projects.json` to add new projects:
+Edit the `projectsData` array in `components/Dashboard.tsx` to add new projects:
 
-```json
+```javascript
 {
   "name": "Your Project",
   "description": "Project description",
@@ -84,4 +89,6 @@ Edit `data/projects.json` to add new projects:
   "logo": null,
   "targetWeeklyHours": 8
 }
-``` 
+```
+
+**Note**: Projects data is now inline in the component to avoid build issues. You can move it to a separate file later if preferred. 

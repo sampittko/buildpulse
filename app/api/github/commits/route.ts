@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
   }
 
   const token = process.env.GITHUB_TOKEN;
+  let githubUsername = process.env.GITHUB_USERNAME;
+
   if (!token) {
     return NextResponse.json({ error: 'GitHub token not configured' }, { status: 500 });
   }
@@ -20,9 +22,16 @@ export async function GET(request: NextRequest) {
     const [owner, repoName] = repo.split('/');
     const { start } = getCurrentWeekBounds();
 
+    // If no username provided, get the authenticated user's login
+    if (!githubUsername) {
+      const { data: user } = await octokit.rest.users.getAuthenticated();
+      githubUsername = user.login;
+    }
+
     const { data: commits } = await octokit.rest.repos.listCommits({
       owner,
       repo: repoName,
+      author: githubUsername,
       since: start.toISOString(),
       per_page: 100,
     });
