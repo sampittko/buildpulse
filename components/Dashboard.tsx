@@ -20,7 +20,7 @@ const projectsData = [
     "targetWeeklyHours": 8
   },
   {
-    "name": "Secret project",
+    "name": "Hostio",
     "description": "I've been building this since November in a team of 5 devs with Next.js and Payload CMS",
     "githubRepo": null,
     "githubRepoPrivate": ["extropysk/hookers", "extropysk/hookers-frontend"],
@@ -28,7 +28,7 @@ const projectsData = [
     "startYear": 2024,
     "endYear": null,
     "tags": ["Entrepreneurship"],
-    "url": null,
+    "url": "https://hostio.app/?utm_source=samuelpitonak.sk",
     "logo": null,
     "targetWeeklyHours": 8
   }
