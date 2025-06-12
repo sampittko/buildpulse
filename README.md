@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BuildPulse
 
-## Getting Started
+I needed a project health dashboard to track my coding progress and time commitment across multiple projects so here it is.
 
-First, run the development server:
+## What it does
 
+BuildPulse monitors your project health by combining:
+- **GitHub commit activity** from your repositories
+- **Time tracking data** from Toggl Track 
+- **Health scoring** based on weekly targets and actual progress
+
+Each project gets a health score (0-100%) with color-coded status indicators to help you stay accountable and maintain momentum across all your work.
+
+## Quick Start
+
+1. Copy `.env.local.example` to `.env.local` and add your tokens:
+   - GitHub Personal Access Token (with repo access)
+   - Toggl Track API Token
+   - Your GitHub username
+
+2. Install and run:
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit the projects array in `components/Dashboard.tsx` to track your own projects. Each project needs:
+- GitHub repository (public or private)
+- Toggl project ID
+- Target weekly hours
+- Basic project info
 
-## Learn More
+See `SETUP.md` for detailed configuration instructions.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with Next.js, TypeScript, and Tailwind CSS.
